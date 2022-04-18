@@ -4,11 +4,24 @@ import Document, {
   Main,
   NextScript,
   DocumentContext,
+  DocumentInitialProps,
 } from "next/document";
 import { CssBaseline } from "@nextui-org/react";
 
+interface Props extends DocumentInitialProps {
+  styles: any;
+}
+
 class MyDocument extends Document {
-  static async getInitialProps(ctx: DocumentContext) {
+  static async getInitialProps(ctx: DocumentContext): Promise<Props> {
+    const originalRenderPage = ctx.renderPage;
+
+    ctx.renderPage = () =>
+      originalRenderPage({
+        enhanceApp: (App) => App,
+        enhanceComponent: (Component) => Component,
+      });
+
     const initialProps = await Document.getInitialProps(ctx);
     return {
       ...initialProps,
@@ -18,7 +31,7 @@ class MyDocument extends Document {
 
   render() {
     return (
-      <Html lang="es">
+      <Html>
         <Head>{CssBaseline.flush()}</Head>
         <body>
           <Main />
